@@ -6,7 +6,7 @@ services:
     dockerContext: .
     plan: starter
     region: oregon
-    branch: main
+    branch: master
     autoDeploy: true
     healthCheckPath: /health
     envVars:
