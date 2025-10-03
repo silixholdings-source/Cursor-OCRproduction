@@ -1,0 +1,53 @@
+{
+  "name": "ai-erp-saas-app",
+  "version": "1.0.0",
+  "description": "AI-powered ERP SaaS application with OCR, 3-way matching, and multi-tenant support",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "web",
+    "mobile"
+  ],
+  "scripts": {
+    "dev": "npm run dev:web",
+    "dev:all": "npm run dev:backend & npm run dev:web & npm run dev:mobile",
+    "dev:web-only": "cd web && npm run dev",
+    "dev:backend": "cd backend && python -m uvicorn src.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:web": "cd web && npm run dev",
+    "dev:mobile": "cd mobile && npm start",
+    "dev:docker": "docker-compose -f docker-compose.dev.yml up",
+    "test": "npm run test:backend && npm run test:web && npm run test:mobile",
+    "test:backend": "cd backend && npm test",
+    "test:web": "cd web && npm test",
+    "test:mobile": "cd mobile && npm test",
+    "build": "npm run build:backend && npm run build:web && npm run build:mobile",
+    "build:backend": "cd backend && npm run build",
+    "build:web": "cd web && npm run build",
+    "build:mobile": "cd mobile && npm run build",
+    "start": "docker-compose up",
+    "start:dev": "docker-compose -f docker-compose.dev.yml up",
+    "stop": "docker-compose down",
+    "clean": "docker-compose down -v --remove-orphans",
+    "seed": "cd backend && npm run seed",
+    "migrate": "cd backend && npm run migrate",
+    "lint": "npm run lint:backend && npm run lint:web && npm run lint:mobile",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:web": "cd web && npm run lint",
+    "lint:mobile": "cd mobile && npm run lint",
+    "format": "npm run format:backend && npm run format:web && npm run format:mobile",
+    "format:backend": "cd backend && npm run format",
+    "format:web": "cd web && npm run format",
+    "format:mobile": "cd mobile && npm run format"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "pdf-parse": "^1.1.1"
+  }
+}

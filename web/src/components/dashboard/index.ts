@@ -1,0 +1,8 @@
+export { RealTimeDashboard } from './real-time-dashboard'
+export { AnalyticsDashboard } from './analytics-dashboard'
+export { PerformanceDashboard } from './performance-dashboard'
+export { SecurityDashboard } from './security-dashboard'
+export { AuditDashboard } from './audit-dashboard'
+export { IntegrationDashboard } from './integration-dashboard'
+export { AIInsightsDashboard } from './ai-insights-dashboard'
+export { AdvancedDashboard } from './advanced-dashboard'

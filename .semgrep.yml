@@ -1,0 +1,40 @@
+rules:
+  - id: python-security
+    patterns:
+      - pattern-either:
+          - pattern: exec(...)
+          - pattern: eval(...)
+          - pattern: os.system(...)
+          - pattern: subprocess.call(...)
+          - pattern: pickle.loads(...)
+    message: "Potential security vulnerability detected"
+    languages: [python]
+    severity: ERROR
+
+  - id: sql-injection
+    patterns:
+      - pattern: f"SELECT ... {var} ..."
+      - pattern: f"INSERT ... {var} ..."
+      - pattern: f"UPDATE ... {var} ..."
+      - pattern: f"DELETE ... {var} ..."
+    message: "Potential SQL injection vulnerability"
+    languages: [python]
+    severity: ERROR
+
+  - id: hardcoded-secrets
+    patterns:
+      - pattern: password = "..."
+      - pattern: api_key = "..."
+      - pattern: secret = "..."
+      - pattern: token = "..."
+    message: "Hardcoded secret detected"
+    languages: [python]
+    severity: WARNING
+
+  - id: weak-crypto
+    patterns:
+      - pattern: hashlib.md5(...)
+      - pattern: hashlib.sha1(...)
+    message: "Weak cryptographic hash function used"
+    languages: [python]
+    severity: WARNING

@@ -1,0 +1,351 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar styles for country dropdown */
+@layer utilities {
+  .scrollbar-thin {
+    /* Webkit browsers first */
+    -webkit-scrollbar-width: thin;
+    /* Modern browsers */
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+    background-color: rgb(209 213 219);
+    border-radius: 0.375rem;
+  }
+  
+  .scrollbar-track-gray-100::-webkit-scrollbar-track {
+    background-color: rgb(243 244 246);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(243 244 246);
+    border-radius: 0.375rem;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(209 213 219);
+    border-radius: 0.375rem;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(156 163 175);
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 355.7 100% 97.3%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+    --info: 199 89% 48%;
+    --info-foreground: 210 40% 98%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 144.9 80.4% 10%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+    --info: 199 89% 48%;
+    --info-foreground: 210 40% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/50 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/70;
+  }
+  
+  /* Selection styles */
+  ::selection {
+    @apply bg-primary/20 text-primary-foreground;
+  }
+  
+  /* Focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+  
+  /* Typography improvements */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+  
+  h4 {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+  
+  h5 {
+    @apply text-lg md:text-xl lg:text-2xl;
+  }
+  
+  h6 {
+    @apply text-base md:text-lg lg:text-xl;
+  }
+  
+  /* Link styles */
+  a {
+    @apply text-primary hover:text-primary/80 transition-colors;
+  }
+  
+  /* Button base styles */
+  button {
+    @apply transition-all duration-200;
+  }
+  
+  /* Form elements */
+  input, textarea, select {
+    @apply transition-colors duration-200;
+  }
+  
+  /* Dark mode enhancements */
+  .dark {
+    /* Enhanced dark mode gradients */
+    background: linear-gradient(135deg, hsl(222.2 84% 4.9%) 0%, hsl(222.2 84% 6.9%) 100%);
+  }
+  
+  .dark .bg-background {
+    background: linear-gradient(135deg, hsl(222.2 84% 4.9%) 0%, hsl(222.2 84% 6.9%) 100%);
+  }
+  
+  .dark .bg-card {
+    background: linear-gradient(135deg, hsl(222.2 84% 6.9%) 0%, hsl(222.2 84% 8.9%) 100%);
+    border: 1px solid hsl(217.2 32.6% 20%);
+  }
+  
+  .dark .border {
+    border-color: hsl(217.2 32.6% 20%);
+  }
+  
+  .dark .shadow-lg {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dark .shadow-md {
+    box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .shadow-sm {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Enhanced dark mode text contrast */
+  .dark .text-muted-foreground {
+    color: hsl(215 20.2% 70%);
+  }
+  
+  /* Dark mode button enhancements */
+  .dark .bg-primary {
+    background: linear-gradient(135deg, hsl(217.2 91.2% 59.8%) 0%, hsl(217.2 91.2% 65%) 100%);
+  }
+  
+  .dark .bg-primary:hover {
+    background: linear-gradient(135deg, hsl(217.2 91.2% 65%) 0%, hsl(217.2 91.2% 70%) 100%);
+  }
+  
+  /* Dark mode input enhancements */
+  .dark input, .dark textarea, .dark select {
+    background: hsl(222.2 84% 6.9%);
+    border-color: hsl(217.2 32.6% 20%);
+  }
+  
+  .dark input:focus, .dark textarea:focus, .dark select:focus {
+    border-color: hsl(217.2 91.2% 59.8%);
+    box-shadow: 0 0 0 2px hsl(217.2 91.2% 59.8% / 0.2);
+  }
+  
+  /* Dark mode table enhancements */
+  .dark table {
+    background: hsl(222.2 84% 6.9%);
+  }
+  
+  .dark thead {
+    background: hsl(217.2 32.6% 15%);
+  }
+  
+  .dark tbody tr:hover {
+    background: hsl(217.2 32.6% 12%);
+  }
+  
+  /* Dark mode modal enhancements */
+  .dark .bg-popover {
+    background: linear-gradient(135deg, hsl(222.2 84% 6.9%) 0%, hsl(222.2 84% 8.9%) 100%);
+    border: 1px solid hsl(217.2 32.6% 20%);
+  }
+  
+  /* Dark mode navigation enhancements */
+  .dark nav a:hover {
+    color: hsl(217.2 91.2% 70%);
+  }
+  
+  /* Dark mode code blocks */
+  .dark pre, .dark code {
+    background: hsl(217.2 32.6% 15%);
+    border: 1px solid hsl(217.2 32.6% 20%);
+  }
+  
+  /* Loading states */
+  .loading {
+    @apply animate-pulse;
+  }
+  
+  .loading-skeleton {
+    @apply bg-muted animate-pulse rounded;
+  }
+  
+  /* Status indicators */
+  .status-pending {
+    @apply bg-status-pending text-white;
+  }
+  
+  .status-approved {
+    @apply bg-status-approved text-white;
+  }
+  
+  .status-rejected {
+    @apply bg-status-rejected text-white;
+  }
+  
+  .status-draft {
+    @apply bg-status-draft text-white;
+  }
+  
+  .status-processing {
+    @apply bg-status-processing text-white;
+  }
+  
+  /* Animations */
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+  
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  /* Responsive utilities */
+  .container-responsive {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Print styles */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    body {
+      @apply bg-white text-black;
+    }
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    :root {
+      --border: 0 0% 0%;
+      --input: 0 0% 0%;
+      --ring: 0 0% 0%;
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

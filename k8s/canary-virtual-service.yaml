@@ -1,0 +1,51 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ai-erp-saas-canary
+  namespace: ai-erp-saas
+spec:
+  hosts:
+  - ai-erp-saas.example.com
+  http:
+  - match:
+    - headers:
+        canary:
+          exact: "true"
+    route:
+    - destination:
+        host: backend-canary
+        port:
+          number: 8000
+    - destination:
+        host: frontend-canary
+        port:
+          number: 3000
+  - route:
+    - destination:
+        host: backend
+        port:
+          number: 8000
+      weight: 90  # 90% to stable
+    - destination:
+        host: backend-canary
+        port:
+          number: 8000
+      weight: 10  # 10% to canary
+    - destination:
+        host: frontend
+        port:
+          number: 3000
+      weight: 90  # 90% to stable
+    - destination:
+        host: frontend-canary
+        port:
+          number: 3000
+      weight: 10  # 10% to canary
+
+
+
+
+
+
+
+

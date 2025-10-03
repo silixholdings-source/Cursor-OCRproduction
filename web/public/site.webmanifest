@@ -1,0 +1,22 @@
+{
+  "name": "AI ERP SaaS",
+  "short_name": "AI ERP",
+  "description": "AI-powered ERP SaaS application with OCR, 3-way matching, and multi-tenant support",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}
+

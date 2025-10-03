@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: ocr-automation-service
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    region: oregon
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: OCR_PROVIDER
+        value: tesseract
+      - key: CONFIDENCE_THRESHOLD
+        value: 0.8
+      - key: MAX_FILE_SIZE
+        value: 10485760  # 10MB in bytes
+      - key: ALLOWED_EXTENSIONS
+        value: pdf,jpg,jpeg,png,tiff
+      - key: SERVICE_NAME
+        value: OCR Automation Service
+      - key: VERSION
+        value: 1.0.0
+      # Optional Azure Form Recognizer (uncomment and set if using Azure)
+      # - key: AZURE_FORM_RECOGNIZER_ENDPOINT
+      #   value: https://your-resource.cognitiveservices.azure.com/
+      # - key: AZURE_FORM_RECOGNIZER_KEY
+      #   value: your-azure-key-here
+      # - key: OCR_PROVIDER
+      #   value: azure
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+      targetCPUPercent: 70
+    resources:
+      cpu: 0.5
+      memory: 1GB
+    buildCommand: echo "Building OCR service..."
+    startCommand: python main.py

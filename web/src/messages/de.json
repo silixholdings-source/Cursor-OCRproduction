@@ -1,0 +1,112 @@
+{
+  "common": {
+    "loading": "Wird geladen...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "view": "Anzeigen",
+    "download": "Herunterladen",
+    "upload": "Hochladen",
+    "refresh": "Aktualisieren",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "yes": "Ja",
+    "no": "Nein",
+    "ok": "OK",
+    "close": "Schließen",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "submit": "Absenden",
+    "reset": "Zurücksetzen"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "invoices": "Rechnungen",
+    "approvals": "Genehmigungen",
+    "vendors": "Lieferanten",
+    "analytics": "Analytik",
+    "settings": "Einstellungen",
+    "help": "Hilfe",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort Bestätigen",
+    "forgotPassword": "Passwort vergessen?",
+    "createAccount": "Konto Erstellen",
+    "signInToAccount": "Melden Sie sich in Ihrem Konto an",
+    "dontHaveAccount": "Haben Sie kein Konto?",
+    "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
+    "invalidCredentials": "Ungültige Anmeldedaten",
+    "loginSuccess": "Anmeldung erfolgreich",
+    "registrationSuccess": "Registrierung erfolgreich"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "overview": "Übersicht",
+    "recentInvoices": "Aktuelle Rechnungen",
+    "pendingApprovals": "Ausstehende Genehmigungen",
+    "totalInvoices": "Gesamte Rechnungen",
+    "totalAmount": "Gesamtbetrag",
+    "approvedThisMonth": "Diesen Monat Genehmigt",
+    "processingTime": "Durchschnittliche Bearbeitungszeit",
+    "viewAll": "Alle Anzeigen"
+  },
+  "invoices": {
+    "title": "Rechnungen",
+    "invoiceNumber": "Rechnungsnummer",
+    "vendor": "Lieferant",
+    "amount": "Betrag",
+    "date": "Datum",
+    "dueDate": "Fälligkeitsdatum",
+    "status": "Status",
+    "category": "Kategorie",
+    "uploadInvoice": "Rechnung Hochladen",
+    "processInvoice": "Rechnung Verarbeiten",
+    "approveInvoice": "Rechnung Genehmigen",
+    "rejectInvoice": "Rechnung Ablehnen",
+    "downloadInvoice": "Rechnung Herunterladen",
+    "viewInvoice": "Rechnung Anzeigen"
+  },
+  "currencies": {
+    "USD": "US-Dollar",
+    "EUR": "Euro",
+    "GBP": "Britisches Pfund",
+    "JPY": "Japanischer Yen",
+    "CNY": "Chinesischer Yuan",
+    "CAD": "Kanadischer Dollar",
+    "AUD": "Australischer Dollar",
+    "CHF": "Schweizer Franken",
+    "SEK": "Schwedische Krone",
+    "NOK": "Norwegische Krone"
+  },
+  "erp": {
+    "title": "ERP-Integration",
+    "addIntegration": "Integration Hinzufügen",
+    "syncNow": "Jetzt Synchronisieren",
+    "configure": "Konfigurieren",
+    "connected": "Verbunden",
+    "disconnected": "Getrennt",
+    "error": "Fehler",
+    "lastSync": "Letzte Synchronisation",
+    "syncFrequency": "Synchronisationsfrequenz",
+    "recordsSynced": "Synchronisierte Datensätze"
+  },
+  "ocr": {
+    "processing": "Dokument wird verarbeitet...",
+    "extracting": "Daten werden extrahiert...",
+    "validating": "Informationen werden validiert...",
+    "complete": "Verarbeitung abgeschlossen",
+    "confidence": "Vertrauen",
+    "reviewRequired": "Überprüfung Erforderlich",
+    "autoApproved": "Automatisch Genehmigt"
+  }
+}
+
+

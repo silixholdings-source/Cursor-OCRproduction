@@ -1,0 +1,112 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "view": "查看",
+    "download": "下载",
+    "upload": "上传",
+    "refresh": "刷新",
+    "search": "搜索",
+    "filter": "过滤",
+    "export": "导出",
+    "import": "导入",
+    "yes": "是",
+    "no": "否",
+    "ok": "确定",
+    "close": "关闭",
+    "next": "下一个",
+    "previous": "上一个",
+    "submit": "提交",
+    "reset": "重置"
+  },
+  "navigation": {
+    "dashboard": "仪表板",
+    "invoices": "发票",
+    "approvals": "审批",
+    "vendors": "供应商",
+    "analytics": "分析",
+    "settings": "设置",
+    "help": "帮助",
+    "logout": "退出登录"
+  },
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "forgotPassword": "忘记密码？",
+    "createAccount": "创建账户",
+    "signInToAccount": "登录您的账户",
+    "dontHaveAccount": "没有账户？",
+    "alreadyHaveAccount": "已有账户？",
+    "invalidCredentials": "无效凭据",
+    "loginSuccess": "登录成功",
+    "registrationSuccess": "注册成功"
+  },
+  "dashboard": {
+    "title": "仪表板",
+    "overview": "概览",
+    "recentInvoices": "最近发票",
+    "pendingApprovals": "待审批",
+    "totalInvoices": "总发票数",
+    "totalAmount": "总金额",
+    "approvedThisMonth": "本月已审批",
+    "processingTime": "平均处理时间",
+    "viewAll": "查看全部"
+  },
+  "invoices": {
+    "title": "发票",
+    "invoiceNumber": "发票号码",
+    "vendor": "供应商",
+    "amount": "金额",
+    "date": "日期",
+    "dueDate": "到期日期",
+    "status": "状态",
+    "category": "类别",
+    "uploadInvoice": "上传发票",
+    "processInvoice": "处理发票",
+    "approveInvoice": "审批发票",
+    "rejectInvoice": "拒绝发票",
+    "downloadInvoice": "下载发票",
+    "viewInvoice": "查看发票"
+  },
+  "currencies": {
+    "USD": "美元",
+    "EUR": "欧元",
+    "GBP": "英镑",
+    "JPY": "日元",
+    "CNY": "人民币",
+    "CAD": "加元",
+    "AUD": "澳元",
+    "CHF": "瑞士法郎",
+    "SEK": "瑞典克朗",
+    "NOK": "挪威克朗"
+  },
+  "erp": {
+    "title": "ERP集成",
+    "addIntegration": "添加集成",
+    "syncNow": "立即同步",
+    "configure": "配置",
+    "connected": "已连接",
+    "disconnected": "已断开",
+    "error": "错误",
+    "lastSync": "最后同步",
+    "syncFrequency": "同步频率",
+    "recordsSynced": "已同步记录"
+  },
+  "ocr": {
+    "processing": "正在处理文档...",
+    "extracting": "正在提取数据...",
+    "validating": "正在验证信息...",
+    "complete": "处理完成",
+    "confidence": "置信度",
+    "reviewRequired": "需要审核",
+    "autoApproved": "自动审批"
+  }
+}
+
+

@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Web Frontend
+  web:
+    image: ai-erp-web:dev
+    container_name: ai-erp-web
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+    ports:
+      - "3000:3000"
+    networks:
+      - ai-erp-network
+    command: npm run dev
+
+networks:
+  ai-erp-network:
+    external: true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

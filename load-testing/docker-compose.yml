@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  k6-load-test:
+    build: .
+    container_name: ai-erp-load-test
+    volumes:
+      - ./results:/load-testing/results
+    environment:
+      - K6_OUT=json=results/load-test-results.json
+    networks:
+      - ai-erp-network
+    depends_on:
+      - ai-erp-backend
+    command: k6 run k6-ocr-load-test.js
+
+  k6-approver-test:
+    build: .
+    container_name: ai-erp-approver-test
+    volumes:
+      - ./results:/load-testing/results
+    environment:
+      - K6_OUT=json=results/approver-test-results.json
+    networks:
+      - ai-erp-network
+    depends_on:
+      - ai-erp-backend
+    command: k6 run k6-approver-load-test.js
+
+  k6-resilience-test:
+    build: .
+    container_name: ai-erp-resilience-test
+    volumes:
+      - ./results:/load-testing/results
+    environment:
+      - K6_OUT=json=results/resilience-test-results.json
+    networks:
+      - ai-erp-network
+    depends_on:
+      - ai-erp-backend
+    command: k6 run k6-resilience-test.js
+
+networks:
+  ai-erp-network:
+    external: true

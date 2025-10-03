@@ -1,0 +1,97 @@
+{
+  "total": 10,
+  "passed": 0,
+  "failed": 10,
+  "tests": [
+    {
+      "id": 1,
+      "name": "Backend Health Check",
+      "status": "FAIL",
+      "message": "Connection failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.348Z"
+    },
+    {
+      "id": 2,
+      "name": "OCR Service Health Check",
+      "status": "FAIL",
+      "message": "OCR service connection failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.362Z"
+    },
+    {
+      "id": 3,
+      "name": "Frontend Health Check",
+      "status": "FAIL",
+      "message": "Frontend connection failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.371Z"
+    },
+    {
+      "id": 4,
+      "name": "OCR Service Direct Test",
+      "status": "FAIL",
+      "message": "OCR service test failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.379Z"
+    },
+    {
+      "id": 5,
+      "name": "OCR Demo Endpoint",
+      "status": "FAIL",
+      "message": "Request failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.449Z"
+    },
+    {
+      "id": 6,
+      "name": "Invoice Data Extraction",
+      "status": "FAIL",
+      "message": "Request failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.460Z"
+    },
+    {
+      "id": 7,
+      "name": "Confidence Score Validation",
+      "status": "FAIL",
+      "message": "Request failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.465Z"
+    },
+    {
+      "id": 8,
+      "name": "Frontend OCR API Integration",
+      "status": "FAIL",
+      "message": "Request failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.471Z"
+    },
+    {
+      "id": 9,
+      "name": "Error Handling",
+      "status": "FAIL",
+      "message": "Error handling test failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.522Z"
+    },
+    {
+      "id": 10,
+      "name": "File Upload Simulation",
+      "status": "FAIL",
+      "message": "Upload test failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-29T23:55:36.537Z"
+    }
+  ],
+  "summary": {
+    "backendHealth": false,
+    "ocrServiceHealth": false,
+    "frontendHealth": false,
+    "ocrProcessing": false,
+    "invoiceExtraction": false,
+    "confidenceValidation": false,
+    "apiIntegration": false,
+    "errorHandling": false
+  }
+}

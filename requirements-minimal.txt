@@ -1,0 +1,21 @@
+# FastAPI and core dependencies (pre-compiled versions)
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+pydantic>=2.0.0
+
+# File handling
+python-multipart>=0.0.5
+aiofiles>=23.0.0
+
+# Image processing
+pillow>=9.0.0
+
+# OCR libraries (Windows compatible)
+pytesseract>=0.3.10
+
+# Basic PDF processing (without compilation)
+pdfplumber>=0.9.0
+
+# Testing
+pytest>=7.0.0
+httpx>=0.24.0

@@ -1,0 +1,5 @@
+[bandit]
+exclude_dirs = tests,migrations,__pycache__,venv,env
+skips = B101,B601,B603,B607
+confidence = medium
+severity = medium

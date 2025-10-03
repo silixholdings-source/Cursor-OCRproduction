@@ -1,0 +1,179 @@
+{
+  "summary": {
+    "total": 28,
+    "passed": 19,
+    "failed": 9,
+    "successRate": "67.9%"
+  },
+  "tests": [
+    {
+      "name": "Homepage Link 1 (AI ERP SaaS)",
+      "status": "PASS",
+      "message": "Clicked: /",
+      "timestamp": "2025-09-26T20:15:13.126Z"
+    },
+    {
+      "name": "Homepage Link 2",
+      "status": "FAIL",
+      "message": "Error: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object",
+      "timestamp": "2025-09-26T20:15:14.735Z"
+    },
+    {
+      "name": "Homepage Link 3",
+      "status": "FAIL",
+      "message": "Error: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object",
+      "timestamp": "2025-09-26T20:15:14.894Z"
+    },
+    {
+      "name": "Homepage Link 4",
+      "status": "FAIL",
+      "message": "Error: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object",
+      "timestamp": "2025-09-26T20:15:15.067Z"
+    },
+    {
+      "name": "Homepage Link 5",
+      "status": "FAIL",
+      "message": "Error: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object",
+      "timestamp": "2025-09-26T20:15:15.226Z"
+    },
+    {
+      "name": "Homepage Link 6",
+      "status": "FAIL",
+      "message": "Error: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object",
+      "timestamp": "2025-09-26T20:15:15.402Z"
+    },
+    {
+      "name": "Homepage Link 7",
+      "status": "FAIL",
+      "message": "Error: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object",
+      "timestamp": "2025-09-26T20:15:15.566Z"
+    },
+    {
+      "name": "Homepage Link 8",
+      "status": "FAIL",
+      "message": "Error: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object",
+      "timestamp": "2025-09-26T20:15:15.733Z"
+    },
+    {
+      "name": "Homepage Link 9",
+      "status": "FAIL",
+      "message": "Error: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object",
+      "timestamp": "2025-09-26T20:15:15.903Z"
+    },
+    {
+      "name": "Homepage Link 10",
+      "status": "FAIL",
+      "message": "Error: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object",
+      "timestamp": "2025-09-26T20:15:16.067Z"
+    },
+    {
+      "name": "OCR File Upload",
+      "status": "PASS",
+      "message": "File uploaded successfully",
+      "timestamp": "2025-09-26T20:15:26.482Z"
+    },
+    {
+      "name": "OCR Process Button",
+      "status": "PASS",
+      "message": "Clicked: Sign In",
+      "timestamp": "2025-09-26T20:15:31.823Z"
+    },
+    {
+      "name": "Upload Button 1 (Sign In)",
+      "status": "PASS",
+      "message": "Button click successful",
+      "timestamp": "2025-09-26T20:15:42.128Z"
+    },
+    {
+      "name": "Upload Button 2 (Start Free Trial)",
+      "status": "PASS",
+      "message": "Button click successful",
+      "timestamp": "2025-09-26T20:15:44.798Z"
+    },
+    {
+      "name": "Login Form",
+      "status": "PASS",
+      "message": "Login form found",
+      "timestamp": "2025-09-26T20:16:03.399Z"
+    },
+    {
+      "name": "Login Inputs",
+      "status": "PASS",
+      "message": "Found 4 input fields",
+      "timestamp": "2025-09-26T20:16:04.899Z"
+    },
+    {
+      "name": "Login Submit Button",
+      "status": "PASS",
+      "message": "Found: Sign In",
+      "timestamp": "2025-09-26T20:16:05.743Z"
+    },
+    {
+      "name": "Features Button 1 (Sign In)",
+      "status": "PASS",
+      "message": "Button click successful",
+      "timestamp": "2025-09-26T20:16:17.087Z"
+    },
+    {
+      "name": "Features Button 2 (Start Free Trial)",
+      "status": "PASS",
+      "message": "Button click successful",
+      "timestamp": "2025-09-26T20:16:19.790Z"
+    },
+    {
+      "name": "Pricing Button 1 (Sign In)",
+      "status": "PASS",
+      "message": "Button click successful",
+      "timestamp": "2025-09-26T20:16:32.733Z"
+    },
+    {
+      "name": "Pricing Button 2 (Start Free Trial)",
+      "status": "PASS",
+      "message": "Button click successful",
+      "timestamp": "2025-09-26T20:16:35.411Z"
+    },
+    {
+      "name": "Contact Form",
+      "status": "PASS",
+      "message": "Contact form found",
+      "timestamp": "2025-09-26T20:16:43.585Z"
+    },
+    {
+      "name": "Contact Inputs",
+      "status": "PASS",
+      "message": "Found 7 input fields",
+      "timestamp": "2025-09-26T20:16:45.087Z"
+    },
+    {
+      "name": "Contact Submit Button",
+      "status": "PASS",
+      "message": "Found: Sign In",
+      "timestamp": "2025-09-26T20:16:45.898Z"
+    },
+    {
+      "name": "Mobile Viewport",
+      "status": "PASS",
+      "message": "375x667 works",
+      "timestamp": "2025-09-26T20:16:47.199Z"
+    },
+    {
+      "name": "Tablet Viewport",
+      "status": "PASS",
+      "message": "768x1024 works",
+      "timestamp": "2025-09-26T20:16:48.542Z"
+    },
+    {
+      "name": "Desktop Viewport",
+      "status": "PASS",
+      "message": "1920x1080 works",
+      "timestamp": "2025-09-26T20:16:49.800Z"
+    },
+    {
+      "name": "404 Error Handling",
+      "status": "PASS",
+      "message": "404 page handled correctly",
+      "timestamp": "2025-09-26T20:16:54.441Z"
+    }
+  ],
+  "timestamp": "2025-09-26T20:16:54.448Z"
+}

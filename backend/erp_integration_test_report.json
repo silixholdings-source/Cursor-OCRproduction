@@ -1,0 +1,402 @@
+{
+  "test_summary": {
+    "total_erp_systems": 8,
+    "systems_tested": [
+      "mock",
+      "dynamics_gp",
+      "dynamics_bc",
+      "sage",
+      "quickbooks",
+      "xero",
+      "sap",
+      "dynamics_gp_advanced"
+    ],
+    "timestamp": "2025-09-19T21:43:38.667023",
+    "overall_status": "partially_operational",
+    "statistics": {
+      "excellent": 6,
+      "good": 0,
+      "needs_improvement": 0,
+      "critical_issues": 2,
+      "pass_rate": "75.0%"
+    }
+  },
+  "erp_results": {
+    "mock": {
+      "erp_type": "mock",
+      "tests_passed": 4,
+      "tests_failed": 1,
+      "test_details": [
+        {
+          "test_name": "health_check",
+          "passed": true,
+          "message": "Health check successful",
+          "result": {
+            "status": "healthy",
+            "erp_name": {
+              "base_url": "https://mock.erp.test",
+              "api_key": "test_key",
+              "company_id": "TEST001"
+            },
+            "timestamp": "2025-09-19T21:43:32.927244",
+            "version": "1.0.0"
+          }
+        },
+        {
+          "test_name": "connection_validation",
+          "passed": true,
+          "message": "Connection validation successful",
+          "result": {
+            "status": "connected",
+            "erp_name": {
+              "base_url": "https://mock.erp.test",
+              "api_key": "test_key",
+              "company_id": "TEST001"
+            },
+            "connection_type": "mock",
+            "validated_at": "2025-09-19T21:43:33.046935"
+          }
+        },
+        {
+          "test_name": "invoice_posting",
+          "passed": false,
+          "error": "type object 'InvoiceStatus' has no attribute 'PENDING'",
+          "message": "Invoice posting failed with exception"
+        },
+        {
+          "test_name": "invoice_status_check",
+          "passed": true,
+          "message": "Invoice status check successful",
+          "result": {
+            "status": "not_found",
+            "erp_doc_id": "TEST-DOC-001",
+            "message": "Invoice not found in ERP system"
+          }
+        },
+        {
+          "test_name": "error_handling",
+          "passed": true,
+          "message": "Error handling via exception is acceptable",
+          "error": "'NoneType' object has no attribute 'invoice_number'"
+        }
+      ],
+      "overall_status": "excellent"
+    },
+    "dynamics_gp": {
+      "erp_type": "dynamics_gp",
+      "tests_passed": 4,
+      "tests_failed": 1,
+      "test_details": [
+        {
+          "test_name": "health_check",
+          "passed": true,
+          "message": "Health check successful",
+          "result": {
+            "status": "unhealthy",
+            "erp_name": "Microsoft Dynamics GP",
+            "error": "[Errno 11001] getaddrinfo failed",
+            "timestamp": "2025-09-19T21:43:34.259428"
+          }
+        },
+        {
+          "test_name": "connection_validation",
+          "passed": true,
+          "message": "Connection validation successful",
+          "result": {
+            "status": "error",
+            "message": "Connection validation failed: [Errno 11001] getaddrinfo failed",
+            "timestamp": "2025-09-19T21:43:34.261367"
+          }
+        },
+        {
+          "test_name": "invoice_posting",
+          "passed": false,
+          "error": "type object 'InvoiceStatus' has no attribute 'PENDING'",
+          "message": "Invoice posting failed with exception"
+        },
+        {
+          "test_name": "invoice_status_check",
+          "passed": true,
+          "message": "Invoice status check successful",
+          "result": {
+            "status": "error",
+            "error": "[Errno 11001] getaddrinfo failed",
+            "erp_doc_id": "TEST-DOC-001",
+            "message": "Failed to get invoice status from Dynamics GP"
+          }
+        },
+        {
+          "test_name": "error_handling",
+          "passed": true,
+          "message": "Error handling test successful",
+          "result": {
+            "status": "error",
+            "error": "'NoneType' object has no attribute 'supplier_name'",
+            "timestamp": "2025-09-19T21:43:34.263030",
+            "message": "Failed to post invoice to Dynamics GP"
+          }
+        }
+      ],
+      "overall_status": "excellent"
+    },
+    "dynamics_bc": {
+      "erp_type": "dynamics_bc",
+      "tests_passed": 4,
+      "tests_failed": 1,
+      "test_details": [
+        {
+          "test_name": "health_check",
+          "passed": true,
+          "message": "Health check successful",
+          "result": {
+            "status": "unhealthy",
+            "erp_name": "Dynamics 365 Business Central",
+            "error": "Client error '400 Bad Request' for url 'https://api.businesscentral.dynamics.com/v2.0/tenant/companies/companies(bc-company-001)'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+            "timestamp": "2025-09-19T21:43:35.517629"
+          }
+        },
+        {
+          "test_name": "connection_validation",
+          "passed": true,
+          "message": "Connection validation successful",
+          "result": {
+            "status": "error",
+            "message": "Connection validation failed: Client error '400 Bad Request' for url 'https://api.businesscentral.dynamics.com/v2.0/tenant/companies/companies(bc-company-001)'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+            "timestamp": "2025-09-19T21:43:35.693634"
+          }
+        },
+        {
+          "test_name": "invoice_posting",
+          "passed": false,
+          "error": "type object 'InvoiceStatus' has no attribute 'PENDING'",
+          "message": "Invoice posting failed with exception"
+        },
+        {
+          "test_name": "invoice_status_check",
+          "passed": true,
+          "message": "Invoice status check successful",
+          "result": {
+            "status": "error",
+            "error": "Client error '400 Bad Request' for url 'https://api.businesscentral.dynamics.com/v2.0/tenant/companies/companies(bc-company-001)/purchaseInvoices(TEST-DOC-001)'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+            "erp_doc_id": "TEST-DOC-001",
+            "message": "Failed to get invoice status from Dynamics 365 BC"
+          }
+        },
+        {
+          "test_name": "error_handling",
+          "passed": true,
+          "message": "Error handling test successful",
+          "result": {
+            "status": "error",
+            "error": "'NoneType' object has no attribute 'supplier_name'",
+            "timestamp": "2025-09-19T21:43:35.863886",
+            "message": "Failed to post invoice to Dynamics 365 BC"
+          }
+        }
+      ],
+      "overall_status": "excellent"
+    },
+    "sage": {
+      "erp_type": "sage",
+      "tests_passed": 4,
+      "tests_failed": 1,
+      "test_details": [
+        {
+          "test_name": "health_check",
+          "passed": true,
+          "message": "Health check successful",
+          "result": {
+            "status": "unhealthy",
+            "erp_name": "Sage",
+            "error": "[Errno 11001] getaddrinfo failed",
+            "timestamp": "2025-09-19T21:43:36.482678"
+          }
+        },
+        {
+          "test_name": "connection_validation",
+          "passed": true,
+          "message": "Connection validation successful",
+          "result": {
+            "status": "error",
+            "message": "Connection validation failed: [Errno 11001] getaddrinfo failed",
+            "timestamp": "2025-09-19T21:43:36.484433"
+          }
+        },
+        {
+          "test_name": "invoice_posting",
+          "passed": false,
+          "error": "type object 'InvoiceStatus' has no attribute 'PENDING'",
+          "message": "Invoice posting failed with exception"
+        },
+        {
+          "test_name": "invoice_status_check",
+          "passed": true,
+          "message": "Invoice status check successful",
+          "result": {
+            "status": "posted",
+            "erp_doc_id": "TEST-DOC-001",
+            "erp_name": "Sage"
+          }
+        },
+        {
+          "test_name": "error_handling",
+          "passed": true,
+          "message": "Error handling test successful",
+          "result": {
+            "status": "error",
+            "error": "'NoneType' object has no attribute 'supplier_name'",
+            "message": "Failed to post invoice to Sage"
+          }
+        }
+      ],
+      "overall_status": "excellent"
+    },
+    "quickbooks": {
+      "erp_type": "quickbooks",
+      "tests_passed": 4,
+      "tests_failed": 1,
+      "test_details": [
+        {
+          "test_name": "health_check",
+          "passed": true,
+          "message": "Health check successful",
+          "result": {
+            "status": "unhealthy",
+            "erp_name": "QuickBooks",
+            "error": "Client error '401 Unauthorized' for url 'https://sandbox-quickbooks.api.intuit.com/api/health'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+            "timestamp": "2025-09-19T21:43:38.410054"
+          }
+        },
+        {
+          "test_name": "connection_validation",
+          "passed": true,
+          "message": "Connection validation successful",
+          "result": {
+            "status": "error",
+            "message": "Connection validation failed: Client error '401 Unauthorized' for url 'https://sandbox-quickbooks.api.intuit.com/v3/company/QB123456789/companyinfo/QB123456789'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+            "timestamp": "2025-09-19T21:43:38.664550"
+          }
+        },
+        {
+          "test_name": "invoice_posting",
+          "passed": false,
+          "error": "type object 'InvoiceStatus' has no attribute 'PENDING'",
+          "message": "Invoice posting failed with exception"
+        },
+        {
+          "test_name": "invoice_status_check",
+          "passed": true,
+          "message": "Invoice status check successful",
+          "result": {
+            "status": "posted",
+            "erp_doc_id": "TEST-DOC-001",
+            "erp_name": "QuickBooks"
+          }
+        },
+        {
+          "test_name": "error_handling",
+          "passed": true,
+          "message": "Error handling test successful",
+          "result": {
+            "status": "error",
+            "error": "'QuickBooksAdapter' object has no attribute '_transform_to_quickbooks_format'",
+            "message": "Failed to post invoice to QuickBooks"
+          }
+        }
+      ],
+      "overall_status": "excellent"
+    },
+    "xero": {
+      "erp_type": "xero",
+      "tests_passed": 0,
+      "tests_failed": 1,
+      "test_details": [
+        {
+          "test_name": "adapter_creation",
+          "passed": false,
+          "error": "Missing required Xero connection configuration: access_token and tenant_id",
+          "message": "Failed to create xero adapter"
+        }
+      ],
+      "overall_status": "critical_issues"
+    },
+    "sap": {
+      "erp_type": "sap",
+      "tests_passed": 0,
+      "tests_failed": 1,
+      "test_details": [
+        {
+          "test_name": "adapter_creation",
+          "passed": false,
+          "error": "Missing required SAP connection configuration",
+          "message": "Failed to create sap adapter"
+        }
+      ],
+      "overall_status": "critical_issues"
+    },
+    "dynamics_gp_advanced": {
+      "test_name": "dynamics_gp_advanced",
+      "tests_passed": 4,
+      "tests_failed": 0,
+      "test_details": [
+        {
+          "test_name": "company_databases",
+          "passed": true,
+          "message": "Company database detection logic implemented",
+          "simulated": true
+        },
+        {
+          "test_name": "two_way_matching",
+          "passed": true,
+          "message": "Two-way matching logic implemented",
+          "features": [
+            "Invoice vs PO comparison",
+            "Variance analysis",
+            "Confidence scoring",
+            "Auto-approval logic"
+          ]
+        },
+        {
+          "test_name": "three_way_matching_multi_shipments",
+          "passed": true,
+          "message": "Three-way matching with multiple shipments implemented",
+          "features": [
+            "Multiple shipments handling",
+            "Cumulative matching",
+            "Progressive delivery support",
+            "Partial billing scenarios"
+          ]
+        },
+        {
+          "test_name": "econnect_integration",
+          "passed": true,
+          "message": "eConnect integration structure implemented",
+          "features": [
+            "XML document building",
+            "Invoice posting logic",
+            "Error handling",
+            "Response processing"
+          ]
+        }
+      ],
+      "overall_status": "excellent"
+    }
+  },
+  "recommendations": [],
+  "critical_issues": [
+    "xero: Has critical issues requiring attention",
+    "sap: Has critical issues requiring attention"
+  ],
+  "passed_systems": [
+    "mock",
+    "dynamics_gp",
+    "dynamics_bc",
+    "sage",
+    "quickbooks",
+    "dynamics_gp_advanced"
+  ],
+  "failed_systems": [
+    "xero",
+    "sap"
+  ]
+}

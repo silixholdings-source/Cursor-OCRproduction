@@ -1,0 +1,18 @@
+{
+  "passed": 0,
+  "failed": 2,
+  "tests": [
+    {
+      "name": "Backend Health Check",
+      "status": "FAIL",
+      "message": "Connection failed: fetch failed",
+      "timestamp": "2025-09-29T23:54:02.109Z"
+    },
+    {
+      "name": "Skipping OCR Tests",
+      "status": "FAIL",
+      "message": "Backend not available",
+      "timestamp": "2025-09-29T23:54:02.111Z"
+    }
+  ]
+}

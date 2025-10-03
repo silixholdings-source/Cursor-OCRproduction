@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ai-erp-postgres
+    environment:
+      POSTGRES_DB: ai_erp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: ai-erp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+
+  # OCR Service
+  ocr-service:
+    build:
+      context: ./ocr-service
+      dockerfile: Dockerfile.simple
+    container_name: ai-erp-ocr
+    ports:
+      - "8001:8001"
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.simple
+    container_name: ai-erp-backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ai_erp
+      - REDIS_URL=redis://redis:6379
+      - OCR_SERVICE_URL=http://ocr-service:8001
+    ports:
+      - "8000:8000"
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - ocr-service
+    command: ["python", "simple_main.py"]
+
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ai-erp-frontend
+    environment:
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      - NODE_ENV=production
+      # Expose backend URL to frontend if needed
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  ai-erp-network:
+    driver: bridge

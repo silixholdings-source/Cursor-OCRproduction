@@ -1,0 +1,38 @@
+AI ERP SaaS - Server Startup Instructions
+==========================================
+
+STEP 1: Start Backend Server
+-----------------------------
+Open PowerShell/Terminal and run these commands ONE AT A TIME:
+
+cd backend
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+Wait for this message:
+"INFO: Uvicorn running on http://0.0.0.0:8000"
+
+STEP 2: Start Frontend Server  
+------------------------------
+Open a NEW PowerShell/Terminal window and run:
+
+cd web
+npm run dev
+
+Wait for this message:
+"Local: http://localhost:3000"
+
+STEP 3: Access Your App
+-----------------------
+Visit: http://localhost:3000
+
+TROUBLESHOOTING:
+- Make sure you run each command in separate terminal windows
+- Don't use && syntax in PowerShell
+- Wait for each server to fully start before testing
+- Check that ports 3000 and 8000 are not being used by other apps
+
+ALTERNATIVE: Use the automated scripts
+--------------------------------------
+Double-click: start-app.bat
+OR run: .\start-servers.ps1
+

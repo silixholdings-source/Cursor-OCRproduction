@@ -1,0 +1,110 @@
+{
+  "summary": {
+    "total": 14,
+    "passed": 3,
+    "failed": 11,
+    "passRate": "21.43%"
+  },
+  "tests": [
+    {
+      "name": "Dashboard Link",
+      "status": "FAIL",
+      "message": "Navigation element not found",
+      "timestamp": "2025-10-02T00:22:29.453Z",
+      "screenshot": null
+    },
+    {
+      "name": "Invoice Upload Link",
+      "status": "FAIL",
+      "message": "Navigation element not found",
+      "timestamp": "2025-10-02T00:22:29.565Z",
+      "screenshot": null
+    },
+    {
+      "name": "OCR Demo Link",
+      "status": "FAIL",
+      "message": "Navigation element not found",
+      "timestamp": "2025-10-02T00:22:29.692Z",
+      "screenshot": null
+    },
+    {
+      "name": "Features Link",
+      "status": "FAIL",
+      "message": "Navigation element not found",
+      "timestamp": "2025-10-02T00:22:29.804Z",
+      "screenshot": null
+    },
+    {
+      "name": "Pricing Link",
+      "status": "FAIL",
+      "message": "Navigation element not found",
+      "timestamp": "2025-10-02T00:22:29.915Z",
+      "screenshot": null
+    },
+    {
+      "name": "Navigation Test",
+      "status": "FAIL",
+      "message": "Navigation test failed: net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+      "timestamp": "2025-10-02T00:22:32.646Z",
+      "screenshot": null
+    },
+    {
+      "name": "Dashboard",
+      "status": "FAIL",
+      "message": "Dashboard test failed: net::ERR_CONNECTION_REFUSED at http://localhost:3000/dashboard",
+      "timestamp": "2025-10-02T00:22:35.041Z",
+      "screenshot": null
+    },
+    {
+      "name": "OCR Functionality",
+      "status": "FAIL",
+      "message": "OCR test failed: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ocr-demo",
+      "timestamp": "2025-10-02T00:22:37.449Z",
+      "screenshot": null
+    },
+    {
+      "name": "Invoice Management",
+      "status": "FAIL",
+      "message": "Invoice management test failed: net::ERR_CONNECTION_REFUSED at http://localhost:3000/invoices/upload",
+      "timestamp": "2025-10-02T00:22:39.868Z",
+      "screenshot": null
+    },
+    {
+      "name": "Settings",
+      "status": "FAIL",
+      "message": "Settings test failed: net::ERR_CONNECTION_REFUSED at http://localhost:3000/dashboard/settings",
+      "timestamp": "2025-10-02T00:22:42.326Z",
+      "screenshot": null
+    },
+    {
+      "name": "Mobile Viewport",
+      "status": "PASS",
+      "message": "Mobile viewport set successfully",
+      "timestamp": "2025-10-02T00:22:43.502Z",
+      "screenshot": null
+    },
+    {
+      "name": "Tablet Viewport",
+      "status": "PASS",
+      "message": "Tablet viewport set successfully",
+      "timestamp": "2025-10-02T00:22:44.710Z",
+      "screenshot": null
+    },
+    {
+      "name": "Desktop Viewport",
+      "status": "PASS",
+      "message": "Desktop viewport set successfully",
+      "timestamp": "2025-10-02T00:22:45.942Z",
+      "screenshot": null
+    },
+    {
+      "name": "Error Handling",
+      "status": "FAIL",
+      "message": "Error handling test failed: net::ERR_CONNECTION_REFUSED at http://localhost:3000/nonexistent-page",
+      "timestamp": "2025-10-02T00:22:48.358Z",
+      "screenshot": null
+    }
+  ],
+  "screenshots": [],
+  "timestamp": "2025-10-02T00:22:49.429Z"
+}

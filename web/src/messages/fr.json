@@ -1,0 +1,112 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "refresh": "Actualiser",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "import": "Importer",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK",
+    "close": "Fermer",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "reset": "Réinitialiser"
+  },
+  "navigation": {
+    "dashboard": "Tableau de Bord",
+    "invoices": "Factures",
+    "approvals": "Approbations",
+    "vendors": "Fournisseurs",
+    "analytics": "Analytique",
+    "settings": "Paramètres",
+    "help": "Aide",
+    "logout": "Se Déconnecter"
+  },
+  "auth": {
+    "login": "Se Connecter",
+    "register": "S'inscrire",
+    "email": "E-mail",
+    "password": "Mot de Passe",
+    "confirmPassword": "Confirmer le Mot de Passe",
+    "forgotPassword": "Mot de passe oublié?",
+    "createAccount": "Créer un Compte",
+    "signInToAccount": "Connectez-vous à votre compte",
+    "dontHaveAccount": "Vous n'avez pas de compte?",
+    "alreadyHaveAccount": "Vous avez déjà un compte?",
+    "invalidCredentials": "Identifiants invalides",
+    "loginSuccess": "Connexion réussie",
+    "registrationSuccess": "Inscription réussie"
+  },
+  "dashboard": {
+    "title": "Tableau de Bord",
+    "overview": "Aperçu",
+    "recentInvoices": "Factures Récentes",
+    "pendingApprovals": "Approbations en Attente",
+    "totalInvoices": "Total des Factures",
+    "totalAmount": "Montant Total",
+    "approvedThisMonth": "Approuvées ce Mois",
+    "processingTime": "Temps de Traitement Moyen",
+    "viewAll": "Voir Tout"
+  },
+  "invoices": {
+    "title": "Factures",
+    "invoiceNumber": "Numéro de Facture",
+    "vendor": "Fournisseur",
+    "amount": "Montant",
+    "date": "Date",
+    "dueDate": "Date d'Échéance",
+    "status": "Statut",
+    "category": "Catégorie",
+    "uploadInvoice": "Téléverser une Facture",
+    "processInvoice": "Traiter la Facture",
+    "approveInvoice": "Approuver la Facture",
+    "rejectInvoice": "Rejeter la Facture",
+    "downloadInvoice": "Télécharger la Facture",
+    "viewInvoice": "Voir la Facture"
+  },
+  "currencies": {
+    "USD": "Dollar Américain",
+    "EUR": "Euro",
+    "GBP": "Livre Sterling",
+    "JPY": "Yen Japonais",
+    "CNY": "Yuan Chinois",
+    "CAD": "Dollar Canadien",
+    "AUD": "Dollar Australien",
+    "CHF": "Franc Suisse",
+    "SEK": "Couronne Suédoise",
+    "NOK": "Couronne Norvégienne"
+  },
+  "erp": {
+    "title": "Intégration ERP",
+    "addIntegration": "Ajouter une Intégration",
+    "syncNow": "Synchroniser Maintenant",
+    "configure": "Configurer",
+    "connected": "Connecté",
+    "disconnected": "Déconnecté",
+    "error": "Erreur",
+    "lastSync": "Dernière Synchronisation",
+    "syncFrequency": "Fréquence de Synchronisation",
+    "recordsSynced": "Enregistrements Synchronisés"
+  },
+  "ocr": {
+    "processing": "Traitement du document...",
+    "extracting": "Extraction des données...",
+    "validating": "Validation des informations...",
+    "complete": "Traitement terminé",
+    "confidence": "Confiance",
+    "reviewRequired": "Révision Requise",
+    "autoApproved": "Auto-Approuvé"
+  }
+}
+
+

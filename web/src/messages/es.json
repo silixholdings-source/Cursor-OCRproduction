@@ -1,0 +1,112 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "download": "Descargar",
+    "upload": "Subir",
+    "refresh": "Actualizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "OK",
+    "close": "Cerrar",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "reset": "Restablecer"
+  },
+  "navigation": {
+    "dashboard": "Panel de Control",
+    "invoices": "Facturas",
+    "approvals": "Aprobaciones",
+    "vendors": "Proveedores",
+    "analytics": "Análisis",
+    "settings": "Configuración",
+    "help": "Ayuda",
+    "logout": "Cerrar Sesión"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "createAccount": "Crear Cuenta",
+    "signInToAccount": "Inicia sesión en tu cuenta",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "invalidCredentials": "Credenciales inválidas",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "registrationSuccess": "Registro exitoso"
+  },
+  "dashboard": {
+    "title": "Panel de Control",
+    "overview": "Resumen",
+    "recentInvoices": "Facturas Recientes",
+    "pendingApprovals": "Aprobaciones Pendientes",
+    "totalInvoices": "Total de Facturas",
+    "totalAmount": "Monto Total",
+    "approvedThisMonth": "Aprobadas Este Mes",
+    "processingTime": "Tiempo Promedio de Procesamiento",
+    "viewAll": "Ver Todo"
+  },
+  "invoices": {
+    "title": "Facturas",
+    "invoiceNumber": "Número de Factura",
+    "vendor": "Proveedor",
+    "amount": "Monto",
+    "date": "Fecha",
+    "dueDate": "Fecha de Vencimiento",
+    "status": "Estado",
+    "category": "Categoría",
+    "uploadInvoice": "Subir Factura",
+    "processInvoice": "Procesar Factura",
+    "approveInvoice": "Aprobar Factura",
+    "rejectInvoice": "Rechazar Factura",
+    "downloadInvoice": "Descargar Factura",
+    "viewInvoice": "Ver Factura"
+  },
+  "currencies": {
+    "USD": "Dólar Estadounidense",
+    "EUR": "Euro",
+    "GBP": "Libra Esterlina",
+    "JPY": "Yen Japonés",
+    "CNY": "Yuan Chino",
+    "CAD": "Dólar Canadiense",
+    "AUD": "Dólar Australiano",
+    "CHF": "Franco Suizo",
+    "SEK": "Corona Sueca",
+    "NOK": "Corona Noruega"
+  },
+  "erp": {
+    "title": "Integración ERP",
+    "addIntegration": "Agregar Integración",
+    "syncNow": "Sincronizar Ahora",
+    "configure": "Configurar",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "error": "Error",
+    "lastSync": "Última Sincronización",
+    "syncFrequency": "Frecuencia de Sincronización",
+    "recordsSynced": "Registros Sincronizados"
+  },
+  "ocr": {
+    "processing": "Procesando documento...",
+    "extracting": "Extrayendo datos...",
+    "validating": "Validando información...",
+    "complete": "Procesamiento completo",
+    "confidence": "Confianza",
+    "reviewRequired": "Revisión Requerida",
+    "autoApproved": "Auto-Aprobado"
+  }
+}
+
+

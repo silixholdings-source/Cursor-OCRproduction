@@ -1,0 +1,175 @@
+{
+  "total": 7,
+  "passed": 6,
+  "failed": 1,
+  "tests": [
+    {
+      "id": 1,
+      "name": "Backend Health Check",
+      "status": "FAIL",
+      "message": "Connection failed: fetch failed",
+      "details": {},
+      "timestamp": "2025-09-30T00:32:33.060Z"
+    },
+    {
+      "id": 2,
+      "name": "OCR Processing Simulation",
+      "status": "PASS",
+      "message": "OCR processing simulation successful",
+      "details": {
+        "extractedFields": [
+          "supplier_name",
+          "supplier_address",
+          "supplier_phone",
+          "supplier_email",
+          "invoice_number",
+          "invoice_date",
+          "due_date",
+          "total_amount",
+          "tax_amount",
+          "currency",
+          "payment_terms",
+          "line_items",
+          "confidence_scores",
+          "processing_metadata"
+        ],
+        "lineItemCount": 1,
+        "supplierName": "Tech Supplies Inc",
+        "invoiceNumber": "INV-2024-001",
+        "totalAmount": 2500,
+        "hasLineItems": true
+      },
+      "timestamp": "2025-09-30T00:32:33.062Z"
+    },
+    {
+      "id": 3,
+      "name": "Data Extraction Validation",
+      "status": "PASS",
+      "message": "All required fields extracted successfully",
+      "details": {
+        "extractedFields": [
+          "supplier_name",
+          "invoice_number",
+          "total_amount",
+          "invoice_date",
+          "due_date",
+          "line_items",
+          "confidence_scores"
+        ],
+        "lineItemCount": 1,
+        "supplierName": "Demo Supplier Corp",
+        "invoiceNumber": "INV-2024-456",
+        "totalAmount": 1500,
+        "hasLineItems": true
+      },
+      "timestamp": "2025-09-30T00:32:33.062Z"
+    },
+    {
+      "id": 4,
+      "name": "Confidence Score Validation",
+      "status": "PASS",
+      "message": "Confidence scores meet MasterPromptDoc requirements",
+      "details": {
+        "totalAmountConfidence": 0.99,
+        "supplierNameConfidence": 0.98,
+        "overallConfidence": 0.97,
+        "totalRequirement": "≥98%",
+        "supplierRequirement": "≥95%",
+        "overallRequirement": "≥90%",
+        "allConfidenceScores": {
+          "supplier_name": 0.98,
+          "invoice_number": 0.99,
+          "total_amount": 0.99,
+          "invoice_date": 0.95,
+          "due_date": 0.97,
+          "overall_confidence": 0.97
+        }
+      },
+      "timestamp": "2025-09-30T00:32:33.062Z"
+    },
+    {
+      "id": 5,
+      "name": "Error Handling Simulation",
+      "status": "PASS",
+      "message": "Error handling working for 3/4 scenarios",
+      "details": {
+        "errorHandlingRate": 75,
+        "handledScenarios": 3,
+        "totalScenarios": 4,
+        "scenarios": [
+          "invalid_file_type",
+          "file_too_large",
+          "corrupted_file",
+          "network_timeout"
+        ]
+      },
+      "timestamp": "2025-09-30T00:32:33.063Z"
+    },
+    {
+      "id": 6,
+      "name": "Performance Simulation",
+      "status": "PASS",
+      "message": "OCR processing completed in 115ms",
+      "details": {
+        "responseTime": 115,
+        "simulatedProcessingTime": 567.5482153934835,
+        "performance": "excellent",
+        "target": "< 5000ms"
+      },
+      "timestamp": "2025-09-30T00:32:33.178Z"
+    },
+    {
+      "id": 7,
+      "name": "OCR Architecture Validation",
+      "status": "PASS",
+      "message": "Architecture 83.3% complete",
+      "details": {
+        "implementationRate": 83.33333333333334,
+        "implementedComponents": 5,
+        "totalComponents": 6,
+        "components": [
+          {
+            "component": "OCR Microservice",
+            "status": "implemented",
+            "port": 8001
+          },
+          {
+            "component": "Backend Integration",
+            "status": "implemented",
+            "port": 8000
+          },
+          {
+            "component": "Frontend Upload",
+            "status": "implemented",
+            "port": 3000
+          },
+          {
+            "component": "Azure OCR Provider",
+            "status": "configured",
+            "endpoint": "azure"
+          },
+          {
+            "component": "Mock OCR Provider",
+            "status": "implemented",
+            "fallback": true
+          },
+          {
+            "component": "Simple OCR Provider",
+            "status": "implemented",
+            "basic": true
+          }
+        ]
+      },
+      "timestamp": "2025-09-30T00:32:33.178Z"
+    }
+  ],
+  "startTime": 1759192352459,
+  "summary": {
+    "backendHealth": false,
+    "ocrProcessing": true,
+    "dataExtraction": true,
+    "confidenceValidation": true,
+    "errorHandling": true,
+    "performance": true
+  }
+}

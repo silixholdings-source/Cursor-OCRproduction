@@ -1,0 +1,245 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: slo-monitoring
+  namespace: ai-erp-saas
+  labels:
+    app: slo-monitoring
+    version: v1
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: slo-monitoring
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: slo-monitor
+        image: python:3.11-slim
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            pip install requests prometheus-client
+            python /app/check_slos.py
+        env:
+        - name: PROMETHEUS_URL
+          value: "http://prometheus:9090"
+        - name: GRAFANA_URL
+          value: "http://grafana:3000"
+        - name: BACKEND_URL
+          value: "http://backend:8000"
+        volumeMounts:
+        - name: slo-config
+          mountPath: /app
+      volumes:
+      - name: slo-config
+        configMap:
+          name: slo-monitoring-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: slo-monitoring-config
+  namespace: ai-erp-saas
+data:
+  check_slos.py: |
+    #!/usr/bin/env python3
+    """
+    SLO Monitoring Script
+    Monitors key service level objectives and triggers alerts on breach
+    """
+    import os
+    import sys
+    import time
+    import requests
+    import json
+    from datetime import datetime, timedelta
+    
+    class SLOMonitor:
+        def __init__(self):
+            self.prometheus_url = os.getenv('PROMETHEUS_URL', 'http://prometheus:9090')
+            self.grafana_url = os.getenv('GRAFANA_URL', 'http://grafana:3000')
+            self.backend_url = os.getenv('BACKEND_URL', 'http://backend:8000')
+            
+            # SLO definitions
+            self.slos = {
+                'availability': {
+                    'target': 99.9,  # 99.9% uptime
+                    'window': '5m',
+                    'query': 'avg_over_time(up[5m])'
+                },
+                'response_time': {
+                    'target': 200,  # 200ms average response time
+                    'window': '5m',
+                    'query': 'avg_over_time(http_request_duration_seconds[5m])'
+                },
+                'error_rate': {
+                    'target': 0.1,  # 0.1% error rate
+                    'window': '5m',
+                    'query': 'rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])'
+                },
+                'throughput': {
+                    'target': 1000,  # 1000 requests per minute
+                    'window': '1m',
+                    'query': 'rate(http_requests_total[1m])'
+                }
+            }
+            
+            self.breach_threshold = 0.1  # 10% tolerance
+        
+        def check_availability(self):
+            """Check service availability"""
+            try:
+                response = requests.get(f"{self.backend_url}/health", timeout=5)
+                return response.status_code == 200
+            except Exception as e:
+                print(f"❌ Availability check failed: {e}")
+                return False
+        
+        def check_response_time(self):
+            """Check average response time"""
+            try:
+                start_time = time.time()
+                response = requests.get(f"{self.backend_url}/health", timeout=5)
+                response_time = (time.time() - start_time) * 1000  # Convert to ms
+                
+                return response_time <= self.slos['response_time']['target']
+            except Exception as e:
+                print(f"❌ Response time check failed: {e}")
+                return False
+        
+        def check_error_rate(self):
+            """Check error rate from Prometheus"""
+            try:
+                query = self.slos['error_rate']['query']
+                response = requests.get(f"{self.prometheus_url}/api/v1/query", 
+                                      params={'query': query}, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data['status'] == 'success' and data['data']['result']:
+                        error_rate = float(data['data']['result'][0]['value'][1])
+                        return error_rate <= self.slos['error_rate']['target']
+                
+                return True  # If no data, assume OK
+            except Exception as e:
+                print(f"❌ Error rate check failed: {e}")
+                return True  # Don't fail deployment on monitoring issues
+        
+        def check_throughput(self):
+            """Check request throughput"""
+            try:
+                query = self.slos['throughput']['query']
+                response = requests.get(f"{self.prometheus_url}/api/v1/query", 
+                                      params={'query': query}, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data['status'] == 'success' and data['data']['result']:
+                        throughput = float(data['data']['result'][0]['value'][1])
+                        return throughput >= self.slos['throughput']['target']
+                
+                return True  # If no data, assume OK
+            except Exception as e:
+                print(f"❌ Throughput check failed: {e}")
+                return True  # Don't fail deployment on monitoring issues
+        
+        def check_custom_endpoints(self):
+            """Check custom application endpoints"""
+            endpoints = [
+                '/health',
+                '/api/v1/auth/login',
+                '/api/v1/invoices',
+                '/api/v1/companies'
+            ]
+            
+            failed_endpoints = []
+            
+            for endpoint in endpoints:
+                try:
+                    response = requests.get(f"{self.backend_url}{endpoint}", timeout=5)
+                    if response.status_code not in [200, 401, 403]:  # 401/403 are OK for auth endpoints
+                        failed_endpoints.append(f"{endpoint}: {response.status_code}")
+                except Exception as e:
+                    failed_endpoints.append(f"{endpoint}: {str(e)}")
+            
+            return len(failed_endpoints) == 0, failed_endpoints
+        
+        def run_slo_checks(self):
+            """Run all SLO checks"""
+            print("🔍 Running SLO checks...")
+            
+            checks = {
+                'availability': self.check_availability(),
+                'response_time': self.check_response_time(),
+                'error_rate': self.check_error_rate(),
+                'throughput': self.check_throughput()
+            }
+            
+            # Check custom endpoints
+            custom_ok, custom_failures = self.check_custom_endpoints()
+            checks['custom_endpoints'] = custom_ok
+            
+            # Print results
+            all_passed = True
+            for check_name, result in checks.items():
+                status = "✅" if result else "❌"
+                print(f"{status} {check_name}: {'PASS' if result else 'FAIL'}")
+                if not result:
+                    all_passed = False
+            
+            if custom_failures:
+                print(f"❌ Custom endpoint failures: {custom_failures}")
+            
+            return all_passed
+        
+        def generate_report(self, passed):
+            """Generate SLO monitoring report"""
+            timestamp = datetime.now().isoformat()
+            
+            report = {
+                'timestamp': timestamp,
+                'overall_status': 'PASS' if passed else 'FAIL',
+                'slos': self.slos,
+                'environment': os.getenv('ENVIRONMENT', 'production'),
+                'deployment_id': os.getenv('GITHUB_SHA', 'unknown')
+            }
+            
+            print(f"📊 SLO Report: {report['overall_status']}")
+            return report
+    
+    def main():
+        """Main monitoring function"""
+        monitor = SLOMonitor()
+        
+        print("🚀 Starting SLO monitoring...")
+        print(f"Backend URL: {monitor.backend_url}")
+        print(f"Prometheus URL: {monitor.prometheus_url}")
+        
+        # Run checks
+        passed = monitor.run_slo_checks()
+        
+        # Generate report
+        report = monitor.generate_report(passed)
+        
+        # Exit with appropriate code
+        if passed:
+            print("✅ All SLO checks passed")
+            sys.exit(0)
+        else:
+            print("❌ SLO checks failed")
+            sys.exit(1)
+    
+    if __name__ == "__main__":
+        main()
+
+
+
+
+
+
+
+

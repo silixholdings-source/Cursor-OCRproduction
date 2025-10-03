@@ -1,0 +1,64 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "navigation": {
+    "home": "Home",
+    "demo": "Demo",
+    "test": "Test",
+    "pricing": "Pricing",
+    "features": "Features",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "signup": "Sign Up"
+  },
+  "demo": {
+    "title": "OCR Demo",
+    "description": "Upload an invoice image or PDF to see our AI extract data automatically",
+    "upload": "Upload Invoice",
+    "selectFile": "Select a PDF or image file to process",
+    "processFile": "Process File",
+    "processing": "Processing...",
+    "reset": "Reset",
+    "extractedData": "Extracted Data",
+    "aiProcessed": "AI-processed invoice information",
+    "success": "Success!",
+    "fileProcessed": "File processed successfully",
+    "vendor": "Vendor",
+    "invoiceNumber": "Invoice #",
+    "amount": "Amount",
+    "currency": "Currency",
+    "date": "Date",
+    "rawData": "Raw Data",
+    "uploadFile": "Upload a file to see extracted data here",
+    "howToTest": "How to Test",
+    "step1": "Upload File",
+    "step1Desc": "Select a PDF or image file",
+    "step2": "AI Processing",
+    "step2Desc": "Our AI extracts data automatically",
+    "step3": "View Results",
+    "step3Desc": "See extracted invoice data"
+  }
+}
+
+
+
+
+
+
+
+
+

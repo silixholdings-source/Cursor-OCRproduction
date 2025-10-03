@@ -1,0 +1,227 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database - Production Configuration
+  postgres:
+    image: postgres:15-alpine
+    container_name: ai-erp-postgres-prod
+    environment:
+      POSTGRES_DB: ai_erp_production
+      POSTGRES_USER: ai_erp_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./ssl/postgres.crt:/etc/ssl/certs/postgres.crt
+      - ./ssl/postgres.key:/etc/ssl/private/postgres.key
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ai_erp_user -d ai_erp_production"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  # Redis Cache - Production Configuration
+  redis:
+    image: redis:7-alpine
+    container_name: ai-erp-redis-prod
+    command: redis-server --requirepass ${REDIS_PASSWORD} --tls-port 6380 --port 0 --tls-cert-file /etc/ssl/certs/redis.crt --tls-key-file /etc/ssl/private/redis.key --tls-ca-cert-file /etc/ssl/certs/ca.crt
+    ports:
+      - "6380:6380"
+    volumes:
+      - redis_data:/data
+      - ./ssl/redis.crt:/etc/ssl/certs/redis.crt
+      - ./ssl/redis.key:/etc/ssl/private/redis.key
+      - ./ssl/ca.crt:/etc/ssl/certs/ca.crt
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--tls", "--cert", "/etc/ssl/certs/redis.crt", "--key", "/etc/ssl/private/redis.key", "--cacert", "/etc/ssl/certs/ca.crt", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  # Backend API - Production Configuration
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.production
+    container_name: ai-erp-backend-prod
+    environment:
+      - DATABASE_URL=postgresql://ai_erp_user:${POSTGRES_PASSWORD}@postgres:5432/ai_erp_production?sslmode=require
+      - REDIS_URL=rediss://:${REDIS_PASSWORD}@redis:6380/0
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logs:/app/logs
+      - ./ssl/backend.crt:/etc/ssl/certs/backend.crt
+      - ./ssl/backend.key:/etc/ssl/private/backend.key
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/logs
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+  # Web Frontend - Production Configuration
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.production
+    container_name: ai-erp-web-prod
+    environment:
+      - NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api/v1
+      - NODE_ENV=production
+      - NEXT_PUBLIC_APP_URL=https://app.yourdomain.com
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "https://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Nginx Reverse Proxy - Production Configuration
+  nginx:
+    image: nginx:alpine
+    container_name: ai-erp-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.production.conf:/etc/nginx/nginx.conf
+      - ./ssl/fullchain.pem:/etc/ssl/certs/fullchain.pem
+      - ./ssl/privkey.pem:/etc/ssl/private/privkey.pem
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - web
+      - backend
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ai-erp-prometheus-prod
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ai-erp-grafana-prod
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - ai-erp-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  ai-erp-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

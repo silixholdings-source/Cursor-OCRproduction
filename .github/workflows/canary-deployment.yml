@@ -1,0 +1,397 @@
+name: 🚀 Canary Deployment with SLO Monitoring
+
+on:
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      deployment_type:
+        description: 'Deployment type'
+        required: true
+        default: 'canary'
+        type: choice
+        options:
+        - canary
+        - blue-green
+        - rolling
+      target_environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      canary_percentage:
+        description: 'Canary traffic percentage'
+        required: true
+        default: '10'
+        type: choice
+        options:
+        - '5'
+        - '10'
+        - '20'
+        - '50'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  KUBE_NAMESPACE: ai-erp-saas
+
+jobs:
+  # Phase 1: Build and test
+  build-and-test:
+    runs-on: ubuntu-latest
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tag: ${{ steps.build.outputs.tags }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Install dependencies
+      working-directory: ./backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+    
+    - name: 🧪 Run tests
+      working-directory: ./backend
+      run: |
+        python -m pytest tests/ -v --cov=src --cov-report=xml
+    
+    - name: 🐳 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: 🔐 Login to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🏗️ Build and push Docker image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./backend/Dockerfile
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        labels: |
+          org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=registry,dest=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  # Phase 2: Deploy to staging for validation
+  deploy-staging:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: ☸️ Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: 🔐 Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+    
+    - name: 📋 Deploy to staging
+      run: |
+        # Deploy backend
+        envsubst < k8s/backend-deployment.yaml | kubectl apply -f -
+        
+        # Deploy frontend
+        envsubst < k8s/frontend-deployment.yaml | kubectl apply -f -
+        
+        # Deploy database
+        kubectl apply -f k8s/postgres-deployment.yaml
+        
+        # Deploy Redis
+        kubectl apply -f k8s/redis-deployment.yaml
+        
+        # Wait for rollout
+        kubectl rollout status deployment/backend -n ${{ env.KUBE_NAMESPACE }}
+        kubectl rollout status deployment/frontend -n ${{ env.KUBE_NAMESPACE }}
+    
+    - name: 🧪 Run staging tests
+      run: |
+        # Wait for services to be ready
+        kubectl wait --for=condition=ready pod -l app=backend -n ${{ env.KUBE_NAMESPACE }} --timeout=300s
+        
+        # Get service URL
+        STAGING_URL=$(kubectl get service backend -n ${{ env.KUBE_NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        # Run health checks
+        curl -f http://$STAGING_URL:8000/health || exit 1
+        
+        # Run smoke tests
+        python scripts/staging_smoke_tests.py --base-url http://$STAGING_URL:8000
+
+  # Phase 3: Canary deployment to production
+  canary-deployment:
+    needs: [build-and-test, deploy-staging]
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: ☸️ Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: 🔐 Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+    
+    - name: 🚀 Deploy canary
+      run: |
+        # Set canary image
+        export CANARY_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+        export CANARY_PERCENTAGE="${{ github.event.inputs.canary_percentage || '10' }}"
+        
+        # Deploy canary backend
+        envsubst < k8s/canary-backend-deployment.yaml | kubectl apply -f -
+        
+        # Deploy canary frontend
+        envsubst < k8s/canary-frontend-deployment.yaml | kubectl apply -f -
+        
+        # Update Istio virtual service for traffic splitting
+        envsubst < k8s/canary-virtual-service.yaml | kubectl apply -f -
+        
+        # Wait for canary rollout
+        kubectl rollout status deployment/backend-canary -n ${{ env.KUBE_NAMESPACE }}
+        kubectl rollout status deployment/frontend-canary -n ${{ env.KUBE_NAMESPACE }}
+    
+    - name: 📊 Start SLO monitoring
+      id: start-monitoring
+      run: |
+        # Start monitoring job
+        kubectl apply -f k8s/slo-monitoring-job.yaml
+        
+        # Get monitoring job name
+        MONITORING_JOB=$(kubectl get jobs -n ${{ env.KUBE_NAMESPACE }} -l app=slo-monitoring -o jsonpath='{.items[0].metadata.name}')
+        echo "monitoring-job=$MONITORING_JOB" >> $GITHUB_OUTPUT
+        
+        # Wait for monitoring to start
+        kubectl wait --for=condition=complete job/$MONITORING_JOB -n ${{ env.KUBE_NAMESPACE }} --timeout=60s || true
+    
+    - name: ⏱️ Monitor SLOs
+      id: monitor-slos
+      run: |
+        # Monitor SLOs for 10 minutes
+        echo "🔍 Monitoring SLOs for 10 minutes..."
+        
+        MONITORING_START=$(date +%s)
+        MONITORING_DURATION=600  # 10 minutes
+        
+        while [ $(($(date +%s) - MONITORING_START)) -lt $MONITORING_DURATION ]; do
+          # Check SLO metrics
+          SLO_STATUS=$(kubectl exec -n ${{ env.KUBE_NAMESPACE }} deployment/slo-monitor -- python check_slos.py 2>/dev/null || echo "FAILED")
+          
+          if [ "$SLO_STATUS" = "FAILED" ]; then
+            echo "❌ SLO breach detected!"
+            echo "slo-breached=true" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          echo "✅ SLOs healthy at $(date)"
+          sleep 30
+        done
+        
+        echo "✅ SLO monitoring completed successfully"
+        echo "slo-breached=false" >> $GITHUB_OUTPUT
+
+  # Phase 4: Promote or rollback based on SLO results
+  promote-or-rollback:
+    needs: [canary-deployment]
+    runs-on: ubuntu-latest
+    environment: production
+    if: always()
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: ☸️ Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: 🔐 Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+    
+    - name: 🎯 Check SLO status and decide action
+      id: decide-action
+      run: |
+        if [ "${{ needs.canary-deployment.outputs.slo-breached }}" = "true" ]; then
+          echo "action=rollback" >> $GITHUB_OUTPUT
+          echo "❌ SLO breach detected - initiating rollback"
+        else
+          echo "action=promote" >> $GITHUB_OUTPUT
+          echo "✅ SLOs healthy - promoting canary to production"
+        fi
+    
+    - name: 🔄 Rollback to stable version
+      if: steps.decide-action.outputs.action == 'rollback'
+      run: |
+        echo "🔄 Rolling back to stable version..."
+        
+        # Get current stable image
+        STABLE_IMAGE=$(kubectl get deployment backend -n ${{ env.KUBE_NAMESPACE }} -o jsonpath='{.spec.template.spec.containers[0].image}')
+        echo "Stable image: $STABLE_IMAGE"
+        
+        # Remove canary deployments
+        kubectl delete deployment backend-canary -n ${{ env.KUBE_NAMESPACE }} || true
+        kubectl delete deployment frontend-canary -n ${{ env.KUBE_NAMESPACE }} || true
+        
+        # Restore traffic to stable version
+        kubectl apply -f k8s/stable-virtual-service.yaml
+        
+        # Scale down canary services
+        kubectl scale deployment backend --replicas=3 -n ${{ env.KUBE_NAMESPACE }}
+        kubectl scale deployment frontend --replicas=3 -n ${{ env.KUBE_NAMESPACE }}
+        
+        echo "✅ Rollback completed"
+    
+    - name: 🚀 Promote canary to production
+      if: steps.decide-action.outputs.action == 'promote'
+      run: |
+        echo "🚀 Promoting canary to production..."
+        
+        # Update stable deployments to canary image
+        CANARY_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+        
+        kubectl set image deployment/backend backend=$CANARY_IMAGE -n ${{ env.KUBE_NAMESPACE }}
+        kubectl set image deployment/frontend frontend=$CANARY_IMAGE -n ${{ env.KUBE_NAMESPACE }}
+        
+        # Wait for rollout
+        kubectl rollout status deployment/backend -n ${{ env.KUBE_NAMESPACE }}
+        kubectl rollout status deployment/frontend -n ${{ env.KUBE_NAMESPACE }}
+        
+        # Remove canary deployments
+        kubectl delete deployment backend-canary -n ${{ env.KUBE_NAMESPACE }}
+        kubectl delete deployment frontend-canary -n ${{ env.KUBE_NAMESPACE }}
+        
+        # Update traffic routing to 100% stable
+        kubectl apply -f k8s/production-virtual-service.yaml
+        
+        echo "✅ Canary promoted to production"
+    
+    - name: 📊 Update deployment status
+      run: |
+        ACTION="${{ steps.decide-action.outputs.action }}"
+        
+        if [ "$ACTION" = "rollback" ]; then
+          echo "❌ Deployment rolled back due to SLO breach"
+          # Create rollback notification
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"🚨 Production rollback completed due to SLO breach"}' \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
+        else
+          echo "✅ Canary successfully promoted to production"
+          # Create success notification
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"🎉 Canary deployment successfully promoted to production"}' \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
+        fi
+
+  # Phase 5: Post-deployment validation
+  post-deployment-validation:
+    needs: [promote-or-rollback]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: ☸️ Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: 🔐 Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+    
+    - name: 🧪 Run post-deployment tests
+      run: |
+        # Get production URL
+        PROD_URL=$(kubectl get service backend -n ${{ env.KUBE_NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        # Run health checks
+        curl -f http://$PROD_URL:8000/health || exit 1
+        
+        # Run critical path tests
+        python scripts/critical_path_tests.py --base-url http://$PROD_URL:8000
+        
+        # Run performance tests
+        python scripts/performance_tests.py --base-url http://$PROD_URL:8000
+    
+    - name: 📈 Generate deployment report
+      run: |
+        echo "📊 Generating deployment report..."
+        
+        # Collect metrics
+        kubectl get pods -n ${{ env.KUBE_NAMESPACE }} > deployment-status.txt
+        kubectl get services -n ${{ env.KUBE_NAMESPACE }} >> deployment-status.txt
+        
+        # Create report
+        cat > deployment-report.md << EOF
+        # 🚀 Deployment Report
+        
+        **Deployment ID:** ${{ github.sha }}
+        **Timestamp:** $(date)
+        **Status:** ${{ needs.promote-or-rollback.result }}
+        
+        ## 📊 System Status
+        
+        \`\`\`
+        $(kubectl get pods -n ${{ env.KUBE_NAMESPACE }})
+        \`\`\`
+        
+        ## 🔗 Services
+        
+        \`\`\`
+        $(kubectl get services -n ${{ env.KUBE_NAMESPACE }})
+        \`\`\`
+        
+        EOF
+        
+        echo "✅ Deployment report generated"
+
+
+
+
+
+
+
+

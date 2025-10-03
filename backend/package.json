@@ -1,0 +1,40 @@
+{
+  "name": "ai-erp-backend",
+  "version": "1.0.0",
+  "description": "AI ERP SaaS Backend API",
+  "private": true,
+  "main": "src/main.py",
+  "scripts": {
+    "start": "uvicorn src.main:app --host 0.0.0.0 --port 8000",
+    "dev": "uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload",
+    "test": "pytest tests/ -v --cov=src --cov-report=html --cov-report=term-missing",
+    "test:unit": "pytest tests/unit/ -v",
+    "test:integration": "pytest tests/integration/ -v",
+    "test:coverage": "pytest tests/ --cov=src --cov-report=html --cov-report=term-missing --cov-fail-under=85",
+    "lint": "flake8 src/ tests/ --max-line-length=100 --exclude=__pycache__,migrations",
+    "format": "black src/ tests/ --line-length=100",
+    "format:check": "black src/ tests/ --line-length=100 --check",
+    "migrate": "alembic upgrade head",
+    "migrate:create": "alembic revision --autogenerate -m",
+    "seed": "python scripts/seed.py",
+    "worker": "celery -A src.worker.celery worker --loglevel=info",
+    "worker:dev": "celery -A src.worker.celery worker --loglevel=debug",
+    "beat": "celery -A src.worker.celery beat --loglevel=info",
+    "health": "curl -f http://localhost:8000/health || exit 1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  }
+}

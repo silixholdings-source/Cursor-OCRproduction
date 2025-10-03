@@ -1,0 +1,184 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: emergency-rollback
+  namespace: ai-erp-saas
+  labels:
+    app: rollback
+    version: v1
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: rollback
+    spec:
+      restartPolicy: Never
+      serviceAccountName: rollback-service-account
+      containers:
+      - name: rollback-executor
+        image: bitnami/kubectl:latest
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            echo "🚨 Starting emergency rollback procedure..."
+            
+            # Get current deployments
+            echo "📊 Current deployment status:"
+            kubectl get deployments -n ai-erp-saas
+            
+            # Get last stable image
+            STABLE_IMAGE=$(kubectl get deployment backend -n ai-erp-saas -o jsonpath='{.metadata.annotations.stable-image}')
+            if [ -z "$STABLE_IMAGE" ]; then
+              echo "⚠️  No stable image annotation found, using latest known good"
+              STABLE_IMAGE="ghcr.io/ai-erp-saas:stable"
+            fi
+            
+            echo "🔄 Rolling back to: $STABLE_IMAGE"
+            
+            # Rollback backend
+            kubectl set image deployment/backend backend=$STABLE_IMAGE -n ai-erp-saas
+            kubectl rollout status deployment/backend -n ai-erp-saas --timeout=300s
+            
+            # Rollback frontend
+            kubectl set image deployment/frontend frontend=$STABLE_IMAGE -n ai-erp-saas
+            kubectl rollout status deployment/frontend -n ai-erp-saas --timeout=300s
+            
+            # Remove canary deployments
+            kubectl delete deployment backend-canary -n ai-erp-saas --ignore-not-found=true
+            kubectl delete deployment frontend-canary -n ai-erp-saas --ignore-not-found=true
+            
+            # Restore traffic routing
+            kubectl apply -f /app/stable-virtual-service.yaml
+            
+            # Scale to full capacity
+            kubectl scale deployment backend --replicas=3 -n ai-erp-saas
+            kubectl scale deployment frontend --replicas=3 -n ai-erp-saas
+            
+            # Wait for pods to be ready
+            kubectl wait --for=condition=ready pod -l app=backend -n ai-erp-saas --timeout=300s
+            kubectl wait --for=condition=ready pod -l app=frontend -n ai-erp-saas --timeout=300s
+            
+            # Run health checks
+            echo "🧪 Running post-rollback health checks..."
+            
+            # Get service IP
+            BACKEND_IP=$(kubectl get service backend -n ai-erp-saas -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+            if [ -z "$BACKEND_IP" ]; then
+              BACKEND_IP=$(kubectl get service backend -n ai-erp-saas -o jsonpath='{.spec.clusterIP}')
+            fi
+            
+            # Health check
+            for i in {1..10}; do
+              if curl -f http://$BACKEND_IP:8000/health; then
+                echo "✅ Health check passed"
+                break
+              else
+                echo "⏳ Health check attempt $i failed, retrying..."
+                sleep 10
+              fi
+            done
+            
+            echo "✅ Rollback completed successfully"
+            
+            # Send notification
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":"🚨 Emergency rollback completed successfully"}' \
+              $SLACK_WEBHOOK_URL || echo "⚠️  Could not send Slack notification"
+        
+        env:
+        - name: SLACK_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: slack-webhook
+              key: url
+        volumeMounts:
+        - name: rollback-config
+          mountPath: /app
+      volumes:
+      - name: rollback-config
+        configMap:
+          name: rollback-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rollback-config
+  namespace: ai-erp-saas
+data:
+  stable-virtual-service.yaml: |
+    apiVersion: networking.istio.io/v1beta1
+    kind: VirtualService
+    metadata:
+      name: ai-erp-saas-stable
+      namespace: ai-erp-saas
+    spec:
+      hosts:
+      - ai-erp-saas.example.com
+      http:
+      - route:
+        - destination:
+            host: backend
+            port:
+              number: 8000
+          weight: 100
+        - destination:
+            host: frontend
+            port:
+              number: 3000
+          weight: 100
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rollback-service-account
+  namespace: ai-erp-saas
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ai-erp-saas
+  name: rollback-role
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.istio.io"]
+  resources: ["virtualservices"]
+  verbs: ["get", "list", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rollback-role-binding
+  namespace: ai-erp-saas
+subjects:
+- kind: ServiceAccount
+  name: rollback-service-account
+  namespace: ai-erp-saas
+roleRef:
+  kind: Role
+  name: rollback-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: slack-webhook
+  namespace: ai-erp-saas
+type: Opaque
+stringData:
+  url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+
+
+
+
+
+
+
+

@@ -1,0 +1,90 @@
+# Core FastAPI dependencies
+fastapi==0.104.1
+pydantic==2.5.0
+pydantic-settings==2.1.0
+uvicorn==0.24.0
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary==2.9.10
+asyncpg==0.29.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Redis & Celery
+redis==5.0.1
+celery==5.3.4
+
+# OCR & AI
+azure-ai-formrecognizer==3.3.0
+pillow>=10.0.0
+opencv-python==4.8.1.78
+
+# Advanced ML & AI
+scikit-learn==1.3.2
+xgboost==2.0.2
+pandas==2.1.4
+numpy==1.25.2
+transformers==4.36.2
+torch==2.1.2
+joblib==1.3.2
+
+# ERP Integration
+requests==2.31.0
+httpx==0.25.2
+
+# Stripe Integration
+stripe==7.8.0
+
+# Microsoft Identity (Azure AD)
+msal==1.28.0
+
+# Observability
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-fastapi==0.42b0
+opentelemetry-instrumentation-sqlalchemy==0.42b0
+opentelemetry-instrumentation-redis==0.42b0
+opentelemetry-instrumentation-celery==0.42b0
+sentry-sdk[fastapi]==1.38.0
+
+# File handling
+python-magic==0.4.27
+aiofiles==23.2.1
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+email-validator==2.1.0
+psutil==5.9.6
+
+# Development & Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+testcontainers==3.7.1
+factory-boy==3.3.0
+faker==20.1.0
+
+# Code quality
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Pre-commit
+pre-commit==3.5.0
+
+# Database drivers
+pyodbc==5.0.1
+
+# OAuth for NetSuite integration
+requests-oauthlib==1.3.1
+
+# Additional ERP dependencies
+cryptography==41.0.7

@@ -1,0 +1,92 @@
+{
+  "load_tests": {
+    "ocr_processing": {
+      "script": "k6-ocr-load-test.js",
+      "description": "Tests concurrent OCR processing with 1000 invoices/minute",
+      "stages": [
+        { "duration": "2m", "target": 10 },
+        { "duration": "5m", "target": 50 },
+        { "duration": "10m", "target": 100 },
+        { "duration": "5m", "target": 0 }
+      ],
+      "thresholds": {
+        "http_req_duration": ["p(95)<2000"],
+        "http_req_failed": ["rate<0.1"],
+        "ocr_success_rate": ["rate>0.9"],
+        "ocr_processing_time": ["p(95)<5000"]
+      }
+    },
+    "approver_workflow": {
+      "script": "k6-approver-load-test.js", 
+      "description": "Tests 200 concurrent approver reads and actions",
+      "stages": [
+        { "duration": "1m", "target": 20 },
+        { "duration": "5m", "target": 50 },
+        { "duration": "10m", "target": 100 },
+        { "duration": "5m", "target": 0 }
+      ],
+      "thresholds": {
+        "http_req_duration": ["p(95)<1000"],
+        "http_req_failed": ["rate<0.05"],
+        "approval_success_rate": ["rate>0.95"],
+        "approval_processing_time": ["p(95)<2000"]
+      }
+    },
+    "resilience_testing": {
+      "script": "k6-resilience-test.js",
+      "description": "Tests system resilience under failure conditions",
+      "stages": [
+        { "duration": "2m", "target": 10 },
+        { "duration": "1m", "target": 50 },
+        { "duration": "2m", "target": 10 },
+        { "duration": "1m", "target": 100 },
+        { "duration": "2m", "target": 0 }
+      ],
+      "thresholds": {
+        "http_req_duration": ["p(95)<5000"],
+        "http_req_failed": ["rate<0.2"],
+        "resilience_success_rate": ["rate>0.8"],
+        "recovery_time": ["p(95)<10000"]
+      }
+    }
+  },
+  "environment": {
+    "base_url": "http://localhost:8000",
+    "api_version": "v1",
+    "timeout": "30s",
+    "retries": 3,
+    "retry_delay": "2s"
+  },
+  "test_data": {
+    "invoices": {
+      "count": 1000,
+      "file_size_range": "100KB-5MB",
+      "formats": ["PDF", "JPG", "PNG", "TIFF"],
+      "suppliers": 50
+    },
+    "users": {
+      "approvers": 200,
+      "admins": 10,
+      "regular_users": 100
+    }
+  },
+  "monitoring": {
+    "metrics": [
+      "http_req_duration",
+      "http_req_failed", 
+      "http_reqs",
+      "vus",
+      "iterations",
+      "data_sent",
+      "data_received"
+    ],
+    "custom_metrics": [
+      "ocr_success_rate",
+      "ocr_processing_time",
+      "approval_success_rate",
+      "approval_processing_time",
+      "resilience_success_rate",
+      "recovery_time"
+    ]
+  }
+}

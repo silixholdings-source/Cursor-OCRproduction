@@ -1,0 +1,466 @@
+name: 🧪 Intelligent Testing & Diagnostics
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - unit
+        - integration
+        - e2e
+        - ocr
+        - erp
+        - performance
+
+jobs:
+  # Phase 1: Run comprehensive tests
+  test-execution:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11]
+        node-version: [18.x]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better diagnostics
+    
+    - name: 🐍 Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    
+    - name: 📦 Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: 📦 Install Python dependencies
+      working-directory: ./backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-xdist pytest-html
+    
+    - name: 📦 Install Node.js dependencies
+      working-directory: ./web
+      run: npm ci
+    
+    - name: 📦 Install Mobile dependencies
+      working-directory: ./mobile
+      run: npm ci
+    
+    - name: 🗄️ Setup test database
+      working-directory: ./backend
+      run: |
+        mkdir -p data
+        python -c "
+        import sys; sys.path.insert(0, 'src')
+        from core.database import Base, engine
+        Base.metadata.create_all(bind=engine)
+        print('✅ Test database created')
+        "
+    
+    - name: 🧪 Run Backend Tests
+      id: backend-tests
+      working-directory: ./backend
+      continue-on-error: true
+      run: |
+        echo "Running backend tests..."
+        python -m pytest tests/ \
+          -v \
+          --cov=src \
+          --cov-report=xml \
+          --cov-report=html \
+          --cov-report=term-missing \
+          --junitxml=test-results.xml \
+          --html=test-report.html \
+          --self-contained-html \
+          --tb=short
+        
+        echo "exit_code=$?" >> $GITHUB_OUTPUT
+    
+    - name: 🧪 Run Frontend Tests
+      id: frontend-tests
+      working-directory: ./web
+      continue-on-error: true
+      run: |
+        echo "Running frontend tests..."
+        npm test -- --coverage --watchAll=false --passWithNoTests
+        echo "exit_code=$?" >> $GITHUB_OUTPUT
+    
+    - name: 🧪 Run Mobile Tests
+      id: mobile-tests
+      working-directory: ./mobile
+      continue-on-error: true
+      run: |
+        echo "Running mobile tests..."
+        npm test -- --coverage --watchAll=false --passWithNoTests
+        echo "exit_code=$?" >> $GITHUB_OUTPUT
+    
+    - name: 🧪 Run Phase 1 Specific Tests
+      id: phase1-tests
+      working-directory: ./backend
+      continue-on-error: true
+      run: |
+        echo "Running Phase 1 tests..."
+        python -m pytest tests/phase1_test_dynamics_gp.py -v
+        python -m pytest tests/phase1_test_ocr_extraction.py -v
+        python -m pytest tests/phase1_test_paystack_subscription.py -v
+        echo "exit_code=$?" >> $GITHUB_OUTPUT
+    
+    - name: 📊 Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ github.run_id }}
+        path: |
+          backend/test-results.xml
+          backend/test-report.html
+          backend/htmlcov/
+          web/coverage/
+          mobile/coverage/
+    
+    - name: 📈 Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        file: ./backend/coverage.xml
+        flags: backend
+        name: backend-coverage
+    
+    - name: 📊 Set test results
+      id: test-results
+      run: |
+        BACKEND_EXIT=${{ steps.backend-tests.outputs.exit_code }}
+        FRONTEND_EXIT=${{ steps.frontend-tests.outputs.exit_code }}
+        MOBILE_EXIT=${{ steps.mobile-tests.outputs.exit_code }}
+        PHASE1_EXIT=${{ steps.phase1-tests.outputs.exit_code }}
+        
+        if [ "$BACKEND_EXIT" != "0" ] || [ "$FRONTEND_EXIT" != "0" ] || [ "$MOBILE_EXIT" != "0" ] || [ "$PHASE1_EXIT" != "0" ]; then
+          echo "tests_failed=true" >> $GITHUB_OUTPUT
+          echo "failed_tests=backend:$BACKEND_EXIT,frontend:$FRONTEND_EXIT,mobile:$MOBILE_EXIT,phase1:$PHASE1_EXIT" >> $GITHUB_OUTPUT
+        else
+          echo "tests_failed=false" >> $GITHUB_OUTPUT
+        fi
+
+  # Phase 2: Intelligent diagnostics when tests fail
+  test-diagnostics:
+    needs: test-execution
+    if: needs.test-execution.outputs.tests_failed == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: 📥 Download test results
+      uses: actions/download-artifact@v3
+      with:
+        name: test-results-${{ github.run_id }}
+        path: ./test-results/
+    
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Install diagnostic dependencies
+      run: |
+        pip install pytest pytest-cov gitpython requests jinja2
+    
+    - name: 🔍 Run intelligent diagnostics
+      id: diagnostics
+      run: |
+        python scripts/test_diagnostics.py \
+          --test-results ./test-results/ \
+          --commit-sha ${{ github.sha }} \
+          --repo ${{ github.repository }} \
+          --branch ${{ github.ref_name }} \
+          --output ./diagnostics.json
+    
+    - name: 📝 Generate diagnostic report
+      id: diagnostic-report
+      run: |
+        python scripts/generate_diagnostic_report.py \
+          --diagnostics ./diagnostics.json \
+          --output ./diagnostic-report.md
+    
+    - name: 📤 Upload diagnostic artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: diagnostic-results-${{ github.run_id }}
+        path: |
+          diagnostics.json
+          diagnostic-report.md
+    
+    - name: 💬 Comment diagnostic results
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('./diagnostic-report.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: report
+          });
+
+  # Phase 3: Auto-generate fix suggestions
+  auto-fix-suggestions:
+    needs: [test-execution, test-diagnostics]
+    if: needs.test-execution.outputs.tests_failed == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 📥 Download diagnostic results
+      uses: actions/download-artifact@v3
+      with:
+        name: diagnostic-results-${{ github.run_id }}
+        path: ./diagnostics/
+    
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Install fix generation dependencies
+      run: |
+        pip install gitpython jinja2 requests
+    
+    - name: 🔧 Generate fix suggestions
+      id: fix-suggestions
+      run: |
+        python scripts/generate_fix_suggestions.py \
+          --diagnostics ./diagnostics/diagnostics.json \
+          --repo ${{ github.repository }} \
+          --output ./fix-suggestions/
+    
+    - name: 📝 Create fix PR
+      id: create-fix-pr
+      run: |
+        python scripts/create_fix_pr.py \
+          --fix-suggestions ./fix-suggestions/ \
+          --repo ${{ github.repository }} \
+          --base-branch ${{ github.ref_name }} \
+          --pr-title "🔧 Auto-fix: Test failures detected" \
+          --pr-body "Automated fix suggestions for failing tests"
+    
+    - name: 💬 Comment fix suggestions
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const suggestions = fs.readFileSync('./fix-suggestions/fix-summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: suggestions
+          });
+
+  # Phase 4: Re-run tests on fix suggestions
+  test-fix-verification:
+    needs: [auto-fix-suggestions]
+    if: needs.auto-fix-suggestions.outputs.fix-pr-created == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout fix branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.auto-fix-suggestions.outputs.fix-branch }}
+    
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Install dependencies
+      working-directory: ./backend
+      run: |
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+    
+    - name: 🧪 Re-run tests on fix branch
+      id: retest
+      working-directory: ./backend
+      run: |
+        python -m pytest tests/ -v --tb=short
+        echo "retest_exit_code=$?" >> $GITHUB_OUTPUT
+    
+    - name: 📊 Update fix PR status
+      if: always()
+      run: |
+        if [ "${{ steps.retest.outputs.retest_exit_code }}" = "0" ]; then
+          echo "✅ Tests now pass on fix branch"
+          # Update PR description with success
+        else
+          echo "❌ Tests still failing on fix branch"
+          # Trigger debug workflow
+        fi
+
+  # Phase 5: Step-by-step debugging for persistent failures
+  step-by-step-debug:
+    needs: [test-fix-verification]
+    if: needs.test-fix-verification.outputs.retest_exit_code != '0'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Install dependencies
+      working-directory: ./backend
+      run: |
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-xdist
+    
+    - name: 🔍 Step 1: Environment diagnostics
+      id: env-diagnostics
+      run: |
+        echo "=== Environment Diagnostics ==="
+        echo "Python version: $(python --version)"
+        echo "Pip version: $(pip --version)"
+        echo "Available packages:"
+        pip list | grep -E "(pytest|fastapi|sqlalchemy)"
+        echo "Working directory: $(pwd)"
+        echo "Python path: $PYTHONPATH"
+        ls -la backend/src/
+    
+    - name: 🔍 Step 2: Import diagnostics
+      id: import-diagnostics
+      run: |
+        echo "=== Import Diagnostics ==="
+        cd backend
+        python -c "
+        import sys
+        sys.path.insert(0, 'src')
+        try:
+            from core.config import settings
+            print('✅ Core config import works')
+        except Exception as e:
+            print(f'❌ Core config import failed: {e}')
+        
+        try:
+            from core.database import Base, engine
+            print('✅ Database import works')
+        except Exception as e:
+            print(f'❌ Database import failed: {e}')
+        
+        try:
+            from models.user import User
+            print('✅ Models import works')
+        except Exception as e:
+            print(f'❌ Models import failed: {e}')
+        "
+    
+    - name: 🔍 Step 3: Database diagnostics
+      id: db-diagnostics
+      run: |
+        echo "=== Database Diagnostics ==="
+        cd backend
+        mkdir -p data
+        python -c "
+        import sys; sys.path.insert(0, 'src')
+        from core.database import Base, engine
+        try:
+            Base.metadata.create_all(bind=engine)
+            print('✅ Database tables created successfully')
+        except Exception as e:
+            print(f'❌ Database creation failed: {e}')
+        "
+    
+    - name: 🔍 Step 4: Test isolation diagnostics
+      id: test-isolation
+      run: |
+        echo "=== Test Isolation Diagnostics ==="
+        cd backend
+        python -m pytest tests/ -v --tb=long --maxfail=1 --durations=10
+    
+    - name: 🔍 Step 5: Generate debug report
+      id: debug-report
+      run: |
+        echo "=== Debug Report ==="
+        echo "Creating comprehensive debug report..."
+        python scripts/generate_debug_report.py \
+          --env-diagnostics "${{ steps.env-diagnostics.outputs.result }}" \
+          --import-diagnostics "${{ steps.import-diagnostics.outputs.result }}" \
+          --db-diagnostics "${{ steps.db-diagnostics.outputs.result }}" \
+          --test-results "${{ steps.test-isolation.outputs.result }}" \
+          --output ./debug-report.md
+    
+    - name: 💬 Comment debug report
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const debugReport = fs.readFileSync('./debug-report.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: debugReport
+          });
+
+  # Phase 6: Final status report
+  final-status:
+    needs: [test-execution, test-diagnostics, auto-fix-suggestions, test-fix-verification, step-by-step-debug]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📊 Generate final status report
+      run: |
+        echo "=== Final Test Status Report ==="
+        echo "Test Execution: ${{ needs.test-execution.result }}"
+        echo "Diagnostics: ${{ needs.test-diagnostics.result }}"
+        echo "Fix Suggestions: ${{ needs.auto-fix-suggestions.result }}"
+        echo "Fix Verification: ${{ needs.test-fix-verification.result }}"
+        echo "Debug Actions: ${{ needs.step-by-step-debug.result }}"
+        
+        if [ "${{ needs.test-execution.result }}" = "success" ]; then
+          echo "🎉 All tests passed!"
+          exit 0
+        else
+          echo "❌ Tests failed - check diagnostics and debug report"
+          exit 1
+        fi
+
+
+
+
+
+
+
+
